@@ -450,4 +450,52 @@
     </actuator>
   </transmission> 
 
+
+  <!-- Eye-in-hand RGB-D camera mounted on gripper_link -->
+  <!-- Offset: 4 cm to +X side, 2 cm below, facing the grasp target (rpy 0 pi 0) -->
+  <link name="camera_link">
+    <inertial>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <mass value="0.001"/>
+      <inertia ixx="1e-6" ixy="0" ixz="0" iyy="1e-6" iyz="0" izz="1e-6"/>
+    </inertial>
+    <!-- Camera body (D405-like: 42mm wide, 42mm tall, 15mm deep; +X = lens axis) -->
+    <visual>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <geometry><box size="0.015 0.042 0.042"/></geometry>
+      <material name="camera_dark"><color rgba="0.15 0.15 0.15 1.0"/></material>
+    </visual>
+    <!-- Lens nub (cylinder aligned with +X axis) -->
+    <visual>
+      <origin xyz="0.0115 0 0" rpy="0 1.5708 0"/>
+      <geometry><cylinder radius="0.008" length="0.008"/></geometry>
+      <material name="lens_blue"><color rgba="0.1 0.2 0.4 1.0"/></material>
+    </visual>
+    <collision>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <geometry><box size="0.015 0.042 0.042"/></geometry>
+    </collision>
+  </link>
+
+  <joint name="camera_joint" type="fixed">
+    <origin xyz="0.04 0.0 0.025" rpy="0 1.309 0"/>
+    <parent link="gripper_link"/>
+    <child link="camera_link"/>
+  </joint>
+
+  <!-- ROS optical frame: Z forward into scene, X right, Y down -->
+  <link name="camera_color_optical_frame"/>
+  <joint name="camera_color_optical_joint" type="fixed">
+    <origin xyz="0 0 0" rpy="-1.5708 0 -1.5708"/>
+    <parent link="camera_link"/>
+    <child link="camera_color_optical_frame"/>
+  </joint>
+
+  <link name="camera_depth_optical_frame"/>
+  <joint name="camera_depth_optical_joint" type="fixed">
+    <origin xyz="0 0 0" rpy="-1.5708 0 -1.5708"/>
+    <parent link="camera_link"/>
+    <child link="camera_depth_optical_frame"/>
+  </joint>
+
 </robot>

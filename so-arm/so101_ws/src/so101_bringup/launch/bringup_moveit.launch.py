@@ -3,7 +3,7 @@ import os
 from launch.substitutions import LaunchConfiguration, Command, PathJoinSubstitution
 
 from launch import LaunchDescription
-from launch.actions import DeclareLaunchArgument, OpaqueFunction
+from launch.actions import DeclareLaunchArgument, OpaqueFunction, TimerAction
 from launch.substitutions import LaunchConfiguration
 from launch.conditions import IfCondition
 from launch_ros.actions import Node
@@ -60,12 +60,12 @@ def generate_launch_description():
                           DeclareLaunchArgument("robot_name", default_value="so101_new_calib"),
                           DeclareLaunchArgument("rviz_config", default_value="config/moveit.rviz"),
                           DeclareLaunchArgument("ros2_controllers_file", default_value="config/ros2_controllers.yaml"),
-                          DeclareLaunchArgument("use_sim_time", default_value="false"), DeclareLaunchArgument(
+                          DeclareLaunchArgument("use_sim_time", default_value="true"), DeclareLaunchArgument(
             "controller_names",
             default_value="joint_state_broadcaster arm_controller gripper_controller",
             description="Space-separated ros2_control controller names to spawn.",
         ), DeclareLaunchArgument(
-            "use_fake_hardware",
+            "simulation",
             default_value="true",
             description="Use mock ros2_control hardware instead of real hardware",
         )]
@@ -99,7 +99,7 @@ def _launch_setup(context, *args, **kwargs):
                 "config",
                 "so101_new_calib.urdf.xacro",
             ]),
-            " use_fake_hardware:=", LaunchConfiguration("use_fake_hardware"),
+            " simulation:=", LaunchConfiguration("simulation"),
             " use_sim_time:=", LaunchConfiguration("use_sim_time"),
         ]),
         value_type=str,
@@ -114,15 +114,6 @@ def _launch_setup(context, *args, **kwargs):
         parameters=[robot_description, {"use_sim_time": use_sim_time}],
     )
 
-    # Publish /joint_states when ros2_control is not running
-    joint_state_publisher = Node(
-        package="joint_state_publisher",
-        executable="joint_state_publisher",
-        name="joint_state_publisher",
-        output="screen",
-        parameters=[{"use_sim_time": use_sim_time}],
-    )
-
     ros2_control_node = Node(
         package="controller_manager",
         executable="ros2_control_node",
@@ -134,24 +125,21 @@ def _launch_setup(context, *args, **kwargs):
         ]
     )
 
-    spawn_jsb = Node(
-        package="controller_manager",
-        executable="spawner",
-        arguments=["joint_state_broadcaster", "--controller-manager", "/controller_manager"],
-        output="screen"
-    )
-    spawners = []
-    for c in controller_names:
-        if c == "joint_state_broadcaster":
-            continue
-        spawners.append(
-            Node(
-                package="controller_manager",
-                executable="spawner",
-                arguments=[c, "--controller-manager", "/controller_manager"],
-                output="screen"
-            )
+    all_controller_names = ["joint_state_broadcaster"] + [
+        c for c in controller_names if c != "joint_state_broadcaster"
+    ]
+
+    spawners = [
+        Node(
+            package="controller_manager",
+            executable="spawner",
+            arguments=[c,
+                       "--controller-manager", "/controller_manager",
+                       "--controller-manager-timeout", "60"],
+            output="screen"
         )
+        for c in all_controller_names
+    ]
 
     move_group = Node(
         package="moveit_ros_move_group",
@@ -169,11 +157,13 @@ def _launch_setup(context, *args, **kwargs):
         parameters=[moveit_common_params, {"use_sim_time": use_sim_time}],
     )
 
+    # Delay spawners by 5s so controller_manager is fully up before spawn calls
+    delayed_spawners = TimerAction(period=5.0, actions=spawners)
+
     return [
         robot_state_publisher,
         ros2_control_node,
-        spawn_jsb,
-        *spawners,
+        delayed_spawners,
         move_group,
         rviz2
     ]

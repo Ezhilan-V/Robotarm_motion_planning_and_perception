@@ -23,36 +23,15 @@
     <group_state name="open" group="gripper">
         <joint name="gripper" value="1.7453"/>
     </group_state>
-    <group_state name="close" group="arm">
+    <group_state name="close" group="gripper">
         <joint name="gripper" value="0"/>
     </group_state>
     <group_state name="start" group="arm">
-        <joint name="elbow_flex" value="0"/>
-        <joint name="shoulder_lift" value="0"/>
-        <joint name="shoulder_pan" value="0"/>
-        <joint name="wrist_flex" value="0"/>
-        <joint name="wrist_roll" value="0"/>
-    </group_state>
-    <group_state name="Position_1" group="arm">
-        <joint name="elbow_flex" value="-0.2521"/>
-        <joint name="shoulder_lift" value="0.5496"/>
-        <joint name="shoulder_pan" value="0.7955"/>
-        <joint name="wrist_flex" value="0.5405"/>
-        <joint name="wrist_roll" value="0"/>
-    </group_state>
-    <group_state name="Position_2" group="arm">
-        <joint name="elbow_flex" value="0.6256"/>
-        <joint name="shoulder_lift" value="-0.5882"/>
-        <joint name="shoulder_pan" value="1.2622"/>
-        <joint name="wrist_flex" value="-0.5954"/>
-        <joint name="wrist_roll" value="1.4218"/>
-    </group_state>
-    <group_state name="Position_3" group="arm">
-        <joint name="elbow_flex" value="0.775"/>
-        <joint name="shoulder_lift" value="-1.3017"/>
-        <joint name="shoulder_pan" value="-0.5409"/>
-        <joint name="wrist_flex" value="0"/>
-        <joint name="wrist_roll" value="0"/>
+        <joint name="shoulder_pan" value="-0.271"/>
+        <joint name="shoulder_lift" value="0.4233"/>
+        <joint name="elbow_flex" value="-0.2101"/>
+        <joint name="wrist_flex" value="0.9223"/>
+        <joint name="wrist_roll" value="1.5295"/>
     </group_state>
     <!--END EFFECTOR: Purpose: Represent information about an end effector.-->
     <end_effector name="end_effector" parent_link="gripper_link" group="gripper" parent_group="arm"/>
@@ -69,4 +48,8 @@
     <disable_collisions link1="lower_arm_link" link2="wrist_link" reason="Adjacent"/>
     <disable_collisions link1="moving_jaw_so101_v1_link" link2="wrist_link" reason="Never"/>
     <disable_collisions link1="shoulder_link" link2="upper_arm_link" reason="Adjacent"/>
+    <disable_collisions link1="camera_link" link2="gripper_link" reason="Adjacent"/>
+    <disable_collisions link1="camera_link" link2="moving_jaw_so101_v1_link" reason="Never"/>
+    <disable_collisions link1="camera_link" link2="wrist_link" reason="Never"/>
+    <disable_collisions link1="camera_link" link2="lower_arm_link" reason="Never"/>
 </robot>

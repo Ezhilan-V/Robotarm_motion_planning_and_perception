@@ -2,10 +2,35 @@
 <?xml-model href="http://download.ros.org/schema/package_format3.xsd" schematypens="http://www.w3.org/2001/XMLSchema"?>
 <package format="3">
   <name>so101_state_machine</name>
-  <version>0.0.0</version>
-  <description>TODO: Package description</description>
-  <maintainer email="test@fireloop.com">test</maintainer>
-  <license>TODO: License declaration</license>
+  <version>0.1.0</version>
+  <description>SO101 pick-and-place behavior tree with MoveIt2 motion planning and RGB-D perception</description>
+  <maintainer email="ezhilan.veluchami@gmail.com">Ezhilan Veluchami</maintainer>
+  <license>Apache-2.0</license>
+
+  <!-- ROS2 core -->
+  <depend>rclpy</depend>
+  <depend>std_msgs</depend>
+  <depend>geometry_msgs</depend>
+  <depend>sensor_msgs</depend>
+  <depend>visualization_msgs</depend>
+  <depend>shape_msgs</depend>
+  <depend>trajectory_msgs</depend>
+  <depend>control_msgs</depend>
+
+  <!-- MoveIt2 -->
+  <depend>moveit_ros_planning_interface</depend>
+  <depend>moveit_msgs</depend>
+  <depend>moveit_py</depend>
+
+  <!-- Perception -->
+  <depend>cv_bridge</depend>
+  <depend>image_transport</depend>
+  <depend>message_filters</depend>
+
+  <!-- Python libs (system) -->
+  <exec_depend>python3-numpy</exec_depend>
+  <exec_depend>python3-opencv</exec_depend>
+  <exec_depend>python3-py-trees</exec_depend>
 
   <test_depend>ament_copyright</test_depend>
   <test_depend>ament_flake8</test_depend>
